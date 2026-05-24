@@ -1,39 +1,37 @@
 import streamlit as st
 import pandas as pd
 
-# Configuration de la page
 st.set_page_config(
-    page_title="Coworking Paris",
+    page_title="Projet Coworking Paris",
     page_icon="🏢",
     layout="wide"
 )
 
-# Titre principal
-st.title("🏢 Analyse des espaces de coworking à Paris")
+st.title("🏢 Projet Coworking : analyse des espaces à Paris")
 
 st.write("""
-Cette application permet d’analyser des espaces de coworking à Paris à partir de données collectées automatiquement.
-Elle aide l’utilisateur à comparer les lieux selon leur adresse, leur présence digitale, leurs réseaux sociaux et leurs moyens de contact.
+J’ai choisi ce sujet car les espaces de coworking sont de plus en plus utilisés par les étudiants,
+les entrepreneurs et les personnes en télétravail.  
+L’objectif de cette application est de permettre à un utilisateur de comparer rapidement plusieurs
+espaces de coworking à Paris selon leurs informations principales : adresse, contact, site web
+et présence sur les réseaux sociaux.
 """)
 
-# Chargement des données
 df = pd.read_excel("coworking_paris.xlsx")
 
-# Nettoyage léger
 df = df.drop_duplicates()
 df = df.fillna("")
 
-# Sidebar
-st.sidebar.title("Filtres")
+st.sidebar.title("🔎 Filtres de recherche")
+st.sidebar.write("Ces filtres permettent de trouver plus facilement un espace adapté aux besoins de l’utilisateur.")
 
-recherche = st.sidebar.text_input("Rechercher un coworking")
+recherche = st.sidebar.text_input("Rechercher un coworking par nom")
 
 filtre_site = st.sidebar.checkbox("Afficher seulement ceux avec un site web")
 filtre_linkedin = st.sidebar.checkbox("Afficher seulement ceux avec LinkedIn")
 filtre_facebook = st.sidebar.checkbox("Afficher seulement ceux avec Facebook")
 filtre_telephone = st.sidebar.checkbox("Afficher seulement ceux avec téléphone")
 
-# Filtres
 df_filtre = df.copy()
 
 if recherche:
@@ -53,13 +51,12 @@ if filtre_facebook:
 if filtre_telephone:
     df_filtre = df_filtre[df_filtre["telephone"] != ""]
 
-# Indicateurs clés
-st.subheader("📊 Indicateurs clés")
+st.subheader("📊 Indicateurs principaux")
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Coworkings", len(df_filtre))
+    st.metric("Coworkings affichés", len(df_filtre))
 
 with col2:
     st.metric("Avec site web", (df_filtre["site"] != "").sum())
@@ -70,8 +67,12 @@ with col3:
 with col4:
     st.metric("Avec téléphone", (df_filtre["telephone"] != "").sum())
 
-# Tableau principal
-st.subheader("📍 Liste des espaces de coworking")
+st.write("""
+Ces indicateurs donnent une première vision de la qualité des informations disponibles.
+Pour moi, un espace de coworking bien renseigné est plus rassurant pour un utilisateur.
+""")
+
+st.subheader("📍 Tableau des espaces de coworking")
 
 colonnes_utiles = [
     "titre",
@@ -85,8 +86,7 @@ colonnes_utiles = [
 
 st.dataframe(df_filtre[colonnes_utiles], use_container_width=True)
 
-# Présence digitale
-st.subheader("🌐 Présence digitale des coworkings")
+st.subheader("🌐 Analyse de la présence digitale")
 
 stats = pd.DataFrame({
     "Canal": ["Site web", "LinkedIn", "Facebook", "Twitter", "Téléphone"],
@@ -101,24 +101,12 @@ stats = pd.DataFrame({
 
 st.bar_chart(stats.set_index("Canal"))
 
-# Analyse automatique
-st.subheader("🧠 Analyse automatique")
+st.write("""
+J’ai ajouté ce graphique pour comparer rapidement les canaux de communication utilisés par les coworkings.
+Cela permet de voir quels moyens sont les plus présents : site web, téléphone ou réseaux sociaux.
+""")
 
-total = len(df_filtre)
-
-if total > 0:
-    pourcentage_site = round((df_filtre["site"] != "").sum() / total * 100, 1)
-    pourcentage_linkedin = round((df_filtre["linkedin"] != "").sum() / total * 100, 1)
-    pourcentage_telephone = round((df_filtre["telephone"] != "").sum() / total * 100, 1)
-
-    st.write(f"{pourcentage_site}% des coworkings affichés possèdent un site web.")
-    st.write(f"{pourcentage_linkedin}% des coworkings affichés possèdent une page LinkedIn.")
-    st.write(f"{pourcentage_telephone}% des coworkings affichés indiquent un numéro de téléphone.")
-else:
-    st.warning("Aucun résultat ne correspond aux filtres sélectionnés.")
-
-# Score digital
-st.subheader("⭐ Classement des coworkings les plus complets")
+st.subheader("⭐ Score de visibilité digitale")
 
 df_score = df_filtre.copy()
 
@@ -133,8 +121,9 @@ df_score["score_digital"] = (
 classement = df_score.sort_values("score_digital", ascending=False)
 
 st.write("""
-Le score digital permet d’identifier les espaces de coworking les plus faciles à contacter et les plus visibles en ligne.
-Plus le score est élevé, plus le coworking possède de canaux de communication.
+J’ai créé un score digital simple.  
+Chaque coworking gagne 1 point lorsqu’il possède un site web, un téléphone ou un réseau social.
+Ce score permet d’identifier les espaces les plus faciles à contacter et les plus visibles en ligne.
 """)
 
 st.dataframe(
@@ -142,8 +131,12 @@ st.dataframe(
     use_container_width=True
 )
 
-# Détails
 st.subheader("🔎 Détail des coworkings")
+
+st.write("""
+Cette partie permet de consulter les informations plus précisément, sans afficher tout le texte directement.
+J’ai choisi d’utiliser des menus déroulants pour rendre l’application plus lisible.
+""")
 
 for index, row in df_filtre.iterrows():
     with st.expander(row["titre"]):
@@ -154,7 +147,7 @@ for index, row in df_filtre.iterrows():
         st.write("**Téléphone :**", row["telephone"])
 
         if row["site"]:
-            st.markdown(f"[🌐 Site web]({row['site']})")
+            st.markdown(f"[🌐 Visiter le site]({row['site']})")
 
         if row["linkedin"]:
             st.markdown(f"[LinkedIn]({row['linkedin']})")
@@ -165,10 +158,12 @@ for index, row in df_filtre.iterrows():
         if row["twitter"]:
             st.markdown(f"[Twitter]({row['twitter']})")
 
-# Conclusion
-st.subheader("✅ Conclusion")
+st.subheader("✅ Conclusion personnelle")
 
 st.write("""
-Cette application montre que la présence digitale est un critère important pour comparer les espaces de coworking.
-Un utilisateur peut ainsi identifier rapidement les lieux les plus visibles, les plus accessibles et les plus simples à contacter.
+Ce projet m’a permis de mieux comprendre comment passer d’un fichier de données à une application interactive.
+J’ai appris à utiliser Streamlit pour rendre les données plus accessibles et plus simples à comprendre.
+
+L’application répond à ma problématique car elle aide un utilisateur à comparer les espaces de coworking
+selon leur visibilité digitale, leurs moyens de contact et les informations disponibles.
 """)
