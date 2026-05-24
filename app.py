@@ -10,8 +10,6 @@ st.set_page_config(
 st.title("🏢 Projet Coworking : analyse des espaces à Paris")
 
 st.write("""
-J’ai choisi ce sujet car les espaces de coworking sont de plus en plus utilisés par les étudiants,
-les entrepreneurs et les personnes en télétravail.  
 L’objectif de cette application est de permettre à un utilisateur de comparer rapidement plusieurs
 espaces de coworking à Paris selon leurs informations principales : adresse, contact, site web
 et présence sur les réseaux sociaux.
@@ -158,12 +156,3 @@ for index, row in df_filtre.iterrows():
         if row["twitter"]:
             st.markdown(f"[Twitter]({row['twitter']})")
 
-st.subheader("✅ Conclusion personnelle")
-
-st.write("""
-Ce projet m’a permis de mieux comprendre comment passer d’un fichier de données à une application interactive.
-J’ai appris à utiliser Streamlit pour rendre les données plus accessibles et plus simples à comprendre.
-
-L’application répond à ma problématique car elle aide un utilisateur à comparer les espaces de coworking
-selon leur visibilité digitale, leurs moyens de contact et les informations disponibles.
-""")
